@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PasswordGuard — Analizador de Seguridad</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- Enlaces a los archivos externos -->
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+
+<div class="container">
+  <div class="card">
+
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">&#x1F512;</div>
+      <div class="header-text">
+        <h1>PasswordGuard</h1>
+        <p>Analizador de seguridad en tiempo real</p>
+      </div>
+      <button class="theme-toggle" id="themeToggle" title="Cambiar tema">&#x1F319;</button>
+    </div>
+
+    <!-- Input -->
+    <div class="input-group">
+      <input type="password" id="passwordInput" placeholder="Ingresa tu contraseña..." autocomplete="off" spellcheck="false">
+      <div class="input-actions">
+        <button id="toggleVisibility" title="Mostrar/Ocultar">&#x1F441;</button>
+        <button id="clearBtn" title="Limpiar">&times;</button>
+      </div>
+    </div>
+
+    <!-- Gauge -->
+    <div class="gauge-row">
+      <div class="gauge">
+        <svg viewBox="0 0 110 110">
+          <circle class="bg-circle" cx="55" cy="55" r="50"/>
+          <circle class="progress-circle" id="progressCircle" cx="55" cy="55" r="50"/>
+        </svg>
+        <div class="center-text">
+          <span class="score" id="scoreDisplay">--</span>
+          <span class="score-label">/ 100</span>
+        </div>
+      </div>
+      <div class="gauge-info">
+        <div class="status-badge">
+          <span class="dot" id="statusDot" style="background:var(--text-muted)"></span>
+          <span id="statusLabel">Esperando...</span>
+        </div>
+        <div class="status-text" id="statusText">Ingresa una contraseña</div>
+        <div class="status-hint" id="statusHint"></div>
+      </div>
+    </div>
+
+    <!-- Bar -->
+    <div class="bar-track">
+      <div class="bar-fill" id="barFill"></div>
+    </div>
+
+    <!-- Analysis Grid -->
+    <div class="analysis-grid" id="analysisGrid">
+      <div class="an-card">
+        <div class="an-label">Longitud</div>
+        <div class="an-value" id="anLength">0</div>
+        <div class="an-sub">caracteres</div>
+      </div>
+      <div class="an-card">
+        <div class="an-label">Entropía</div>
+        <div class="an-value" id="anEntropy">0</div>
+        <div class="an-sub">bits</div>
+      </div>
+      <div class="an-card">
+        <div class="an-label">Tiempo estimado</div>
+        <div class="an-value" id="anTime">--</div>
+        <div class="an-sub">para descifrar</div>
+      </div>
+      <div class="an-card">
+        <div class="an-label">Variedad</div>
+        <div class="an-value" id="anVariety">0/4</div>
+        <div class="an-sub">tipos usados</div>
+      </div>
+      <div class="an-card full">
+        <div class="an-label">Composición</div>
+        <div class="an-bar" id="compositionBar">
+          <span title="Minúsculas" style="background:var(--red)"></span>
+          <span title="Mayúsculas" style="background:var(--orange)"></span>
+          <span title="Números" style="background:var(--yellow)"></span>
+          <span title="Símbolos" style="background:var(--green)"></span>
+        </div>
+        <div class="an-sub" id="compositionText">Esperando datos...</div>
+      </div>
+    </div>
+
+    <!-- Rules -->
+    <div class="rules" id="rules">
+      <div class="rule" data-rule="length8"><span class="check">&#x2715;</span> 8+ caracteres</div>
+      <div class="rule" data-rule="length12"><span class="check">&#x2715;</span> 12+ caracteres</div>
+      <div class="rule" data-rule="lower"><span class="check">&#x2715;</span> Minúsculas</div>
+      <div class="rule" data-rule="upper"><span class="check">&#x2715;</span> Mayúsculas</div>
+      <div class="rule" data-rule="number"><span class="check">&#x2715;</span> Números</div>
+      <div class="rule" data-rule="symbol"><span class="check">&#x2715;</span> Símbolos</div>
+      <div class="rule" data-rule="noSeq"><span class="check">&#x2715;</span> Sin patrones</div>
+    </div>
+
+    <!-- Generator -->
+    <div class="gen-section">
+      <div class="gen-header" id="genToggle">
+        <h3>&#x2699; Generar contraseña</h3>
+        <span class="arrow" id="genArrow">&#x25BC;</span>
+      </div>
+      <div class="gen-body" id="genBody">
+        <div class="gen-controls">
+          <div class="gen-row">
+            <label>Longitud:</label>
+            <input type="range" id="genLength" min="6" max="48" value="20">
+            <span class="len-display" id="genLenDisplay">20</span>
+          </div>
+          <div class="gen-row">
+            <label>Incluir:</label>
+            <div class="chk-group">
+              <label><input type="checkbox" id="genLower" checked> a-z</label>
+              <label><input type="checkbox" id="genUpper" checked> A-Z</label>
+              <label><input type="checkbox" id="genNumber" checked> 0-9</label>
+              <label><input type="checkbox" id="genSymbol" checked> !@#$</label>
+            </div>
+          </div>
+          <div class="gen-output">
+            <input type="text" id="genOutput" readonly placeholder="Genera una contraseña...">
+            <button id="genBtn">Generar</button>
+            <button class="copy-btn" id="genCopyBtn" title="Copiar">&#x1F4CB;</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <button id="testBtn"><span class="icon">&#x1F50D;</span> Probar contraseña de ejemplo</button>
+      <button id="resetBtn"><span class="icon">&#x21BB;</span> Restablecer</button>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+</body>
+</html>
